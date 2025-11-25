@@ -1,112 +1,45 @@
 #include <stdio.h>
-#define MAX 20
 
-int n;
-int distance[MAX];
-
-// Function to find the minimum non-zero value in an array
-int min(int arr[], int len) {
-    int mini = 9999;
-    for (int i = 0; i < len; i++) {
-        if (arr[i] != 0 && arr[i] < mini) {
-            mini = arr[i];
-        }
-    }
-    return mini;
-}
+#define INF 99
+#define MAX 10
 
 int main() {
-    int adj[MAX][MAX], adj1[MAX][MAX], flag[MAX];
-    int i, j, root, x, source;
+    int n, cost[MAX][MAX], visited[MAX];
+    int i, j, edges = 0, u, v, min, total = 0;
 
-    printf("Enter number of nodes: ");
+    printf("Enter number of hosts: ");
     scanf("%d", &n);
 
-    printf("Enter adjacency matrix (%d x %d):\n", n, n);
+    printf("Enter the cost adjacency matrix (99 for no direct link):\n");
     for (i = 0; i < n; i++) {
         for (j = 0; j < n; j++) {
-            scanf("%d", &adj[i][j]);
+            scanf("%d", &cost[i][j]);
         }
+        visited[i] = 0;
     }
 
-    printf("Enter the source for broadcasting: ");
-    scanf("%d", &source);
+    visited[0] = 1; // Start from first host
 
-    // Initialize MST adjacency matrix
-    for (root = 0; root < n; root++) {
+    printf("\nBroadcast Tree (using Prim's MST):\n");
+    while (edges < n - 1) {
+        min = INF;
         for (i = 0; i < n; i++) {
-            distance[i] = adj[root][i];
-        }
-        x = min(distance, n);
-        for (i = 0; i < n; i++) {
-            if (distance[i] == x) {
-                adj1[root][i] = x;
-                adj1[i][root] = x;
-            } else {
-                adj1[root][i] = 0;
+            if (visited[i]) {
+                for (j = 0; j < n; j++) {
+                    if (!visited[j] && cost[i][j] < min) {
+                        min = cost[i][j];
+                        u = i;
+                        v = j;
+                    }
+                }
             }
         }
+        printf("Edge %c - %c (Cost %d)\n", 'A' + u, 'A' + v, min);
+        total += min;
+        visited[v] = 1;
+        edges++;
     }
-
-    // Ensure symmetry in MST
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            if (adj1[i][j] != 0) {
-                adj1[j][i] = adj1[i][j];
-            }
-        }
-    }
-
-    // Print Original Adjacency Matrix
-    printf("\nGiven adjacency matrix:\n");
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            printf("%d ", adj[i][j]);
-        }
-        printf("\n");
-    }
-
-    // Print Minimal Spanning Tree
-    printf("\nMinimal Spanning Tree (MST):\n");
-    for (i = 0; i < n; i++) {
-        for (j = 0; j < n; j++) {
-            printf("%d ", adj1[i][j]);
-        }
-        printf("\n");
-    }
-
-    // Broadcasting process
-    for (i = 0; i < n; i++)
-        flag[i] = 0;
-
-    root = source;
-    flag[root] = 1;
-
-    printf("\nBroadcasting sequence:\n");
-    int done = 0;
-    while (!done) {
-        int sent = 0;
-        for (i = 0; i < n; i++) {
-            if (adj1[root][i] != 0 && flag[root] == 1 && flag[i] != 1) {
-                printf("Router %d sends message to Router %d\n", root, i);
-                flag[i] = 1;
-                sent = 1;
-            }
-        }
-
-        root = (root + 1) % n;
-
-        // Check if all routers have received the message
-        done = 1;
-        for (i = 0; i < n; i++) {
-            if (flag[i] == 0) {
-                done = 0;
-                break;
-            }
-        }
-
-        if (!sent && done) break;
-    }
+    printf("Total cost of broadcast tree = %d\n", total);
 
     return 0;
 }
