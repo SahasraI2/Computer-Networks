@@ -7,36 +7,35 @@
 
 int main() {
     int outputRate, packetSize;
-    int bucket = 0;
     srand(time(0));
 
-    printf("Enter output rate (bytes per second): ");
+    printf("Enter output rate: ");
     scanf("%d", &outputRate);
 
     for (int i = 1; i <= 5; i++) {
         sleep(rand() % 2);
         packetSize = rand() % 1000;
-        printf("\nPacket %d -> Size: %d bytes\n", i, packetSize);
 
-        if (packetSize + bucket > BUCKET_SIZE) {
-            printf("\tBucket overflow! Packet discarded.\n");
+        printf("\nPacket %d -> Size: %d bytes", i, packetSize);
+
+        if (packetSize > BUCKET_SIZE) {
+            printf("\n\tBucket overflow! Packet discarded.\n");
             continue;
         }
 
-        bucket += packetSize;
-        printf("\tPacket added to bucket. Current bucket: %d bytes\n", bucket);
-
-        while (bucket > 0) {
-            if (bucket >= outputRate) {
-                printf("\t%d bytes sent.\n", outputRate);
-                bucket -= outputRate;
+        printf("\n\tProcessing packet...");
+        while (packetSize > 0) {
+            if (packetSize >= outputRate) {
+                printf("\n\t%d bytes sent.", outputRate);
+                packetSize -= outputRate;
             } else {
-                printf("\tLast %d bytes sent.\n", bucket);
-                bucket = 0;
+                printf("\n\tLast %d bytes sent.", packetSize);
+                packetSize = 0;
             }
             sleep(1);
         }
-        printf("\tBucket output successful!\n");
+
+        printf("\n\tBucket output successful!\n");
     }
 
     return 0;
@@ -44,34 +43,36 @@ int main() {
 
 
 
-Enter output rate (bytes per second): 200
+
+Enter output rate: 200
 
 
 
-Enter output rate (bytes per second): 200
+    Enter output rate: 200
 
-Packet 1 -> Size: 430 bytes
-    Packet added to bucket. Current bucket: 430 bytes
+Packet 1 -> Size: 480 bytes
+    Processing packet...
     200 bytes sent.
     200 bytes sent.
-    Last 30 bytes sent.
+    Last 80 bytes sent.
     Bucket output successful!
 
-Packet 2 -> Size: 873 bytes
+Packet 2 -> Size: 950 bytes
     Bucket overflow! Packet discarded.
 
-Packet 3 -> Size: 120 bytes
-    Packet added to bucket. Current bucket: 120 bytes
-    Last 120 bytes sent.
+Packet 3 -> Size: 210 bytes
+    Processing packet...
+    200 bytes sent.
+    Last 10 bytes sent.
     Bucket output successful!
 
 Packet 4 -> Size: 511 bytes
-    Bucket added to bucket. Current bucket: 511 bytes
+    Processing packet...
     200 bytes sent.
     200 bytes sent.
     Last 111 bytes sent.
     Bucket output successful!
 
-Packet 5 -> Size: 950 bytes
+Packet 5 -> Size: 740 bytes
     Bucket overflow! Packet discarded.
 
