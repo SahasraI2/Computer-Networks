@@ -23,3 +23,8 @@ int main() {
     printf("After stuffing: %s\n", result);
     return 0;
 }
+
+
+Enter data: AB$CD$EF
+Enter start delimiter: $
+Enter end delimiter: #
